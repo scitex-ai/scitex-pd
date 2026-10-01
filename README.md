@@ -19,9 +19,9 @@
   <a href="https://scitex-pd.readthedocs.io/en/latest/"><img src="https://img.shields.io/readthedocs/scitex-pd?label=docs" alt="docs"></a>
 </p>
 <p align="center">
-  <a href="https://github.com/ywatanabe1989/scitex-pd/actions/workflows/pytest-matrix-on-ubuntu-py3-11-3-12-3-13.yml"><img src="https://img.shields.io/github/actions/workflow/status/ywatanabe1989/scitex-pd/pytest-matrix-on-ubuntu-py3-11-3-12-3-13.yml?branch=develop&label=tests" alt="tests"></a>
-  <a href="https://github.com/ywatanabe1989/scitex-pd/actions/workflows/import-smoke-on-ubuntu-py3-12.yml"><img src="https://img.shields.io/github/actions/workflow/status/ywatanabe1989/scitex-pd/import-smoke-on-ubuntu-py3-12.yml?branch=develop&label=install-check" alt="install-check"></a>
-  <a href="https://github.com/ywatanabe1989/scitex-pd/actions/workflows/newb.yml"><img src="https://img.shields.io/github/actions/workflow/status/ywatanabe1989/scitex-pd/newb.yml?branch=develop&label=quality" alt="quality"></a>
+  <a href="https://github.com/scitex-ai/scitex-pd/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/scitex-ai/scitex-pd/ci.yml?branch=develop&label=tests" alt="tests"></a>
+  <a href="https://github.com/scitex-ai/scitex-pd/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/scitex-ai/scitex-pd/ci.yml?branch=develop&label=install-check" alt="install-check"></a>
+  <a href="https://github.com/scitex-ai/scitex-pd/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/scitex-ai/scitex-pd/ci.yml?branch=develop&label=quality" alt="quality"></a>
   <a href="https://codecov.io/gh/ywatanabe1989/scitex-pd"><img src="https://img.shields.io/codecov/c/github/ywatanabe1989/scitex-pd/develop?label=cov" alt="cov"></a>
 </p>
 <!-- scitex-badges:end -->
@@ -32,34 +32,73 @@
 
 | # | Problem | Solution |
 |---|---------|----------|
-| 1 | **Pandas reshape boilerplate** — coercing dicts/Series/lists into DataFrames, pivoting long↔wide, and locating p-value columns is repeated noise across analysis scripts | **`force_df`, `from_xyz`/`to_xy`, `find_pval`** — small composable helpers with sensible defaults |
-| 2 | **Column ops drift** — every project re-implements rename / reorder / round / merge for stats tables | **`merge_columns`, `mv`, `round`, `replace`, `sort`, `slice`** — uniform DataFrame-in / DataFrame-out helpers |
+| 1 | **Reshape boilerplate** — coercing dicts/Series/lists into DataFrames and locating p-value columns repeats everywhere. | **Coercion helpers** (`force_df`, `from_xyz`/`to_xy`, `find_pval`) with sensible defaults. |
+| 2 | **Column ops drift** — every project re-implements rename / reorder / round / merge for stats tables. | **Uniform helpers** (`merge_columns`, `mv`, `round`, `replace`, `sort`, `slice`) — DataFrame in, DataFrame out. |
+
+## Quick Start
+
+```python
+import scitex_pd as pd_
+
+pd_.force_df(data)              # Coerce dict / Series / list / scalar → DataFrame
+pd_.from_xyz(df, x, y, z)       # Long → wide pivot
+pd_.to_xy(df)                   # Wide → long
+pd_.find_pval(df)               # Locate p-value columns
+```
+
+## Demo
+
+```mermaid
+flowchart LR
+    raw["dict / Series / list / scalar"] --> force["force_df"]
+    force --> df[(DataFrame)]
+    df --> reshape["from_xyz / to_xy / melt_cols"]
+    df --> inspect["find_pval / get_unique"]
+    df --> transform["round / replace / sort / slice / mv"]
+    reshape --> out[(reshaped DataFrame)]
+    inspect --> out2[("p-value columns / uniques")]
+    transform --> out3[(transformed DataFrame)]
+```
+
+<p align="center"><sub><b>Figure 1.</b> Data flow: coerce anything tabular into a DataFrame, then reshape, inspect, or transform it.</sub></p>
 
 ## Installation
 
 ```bash
-pip install scitex-pd
+uv pip install "scitex-pd[all]"
 ```
+
+Requires Python ≥ 3.9.
+
+<details>
+<summary><b>Per-extra installs</b></summary>
+
+<br>
+
+| Extra | Pulls in |
+|---|---|
+| `dev` | tests + lint + dev helpers (`pytest`, `ruff`, `scitex-dev`, …) |
+| `docs` | Sphinx docs build (`sphinx`, `myst-parser`, …) |
+
+</details>
 
 ## Architecture
 
+```mermaid
+flowchart LR
+    raw["dict / Series / list"] --> force["force_df: coerce"]
+    force --> df[(DataFrame)]
+    df --> conv["_convert: from_xyz / to_xy / to_xyz"]
+    df --> find["_find_pval / _find_indi / _get_unique"]
+    df --> col["_merge_columns / _melt_cols / _mv"]
+    df --> tr["_replace / _round / _slice / _sort"]
+    conv --> out[(DataFrame out)]
+    find --> out
+    col --> out
+    tr --> out
 ```
-src/scitex_pd/
-├── __init__.py              # public API surface
-├── _force_df.py             # dict / Series / list → DataFrame
-├── _find_pval.py            # locate p-value columns
-├── _find_indi.py            # boolean-mask helpers
-├── _get_unique.py           # unique-values per column
-├── _merge_columns.py        # combine columns into one
-├── _melt_cols.py            # long ↔ wide reshapes
-├── _mv.py                   # reorder columns
-├── _replace.py              # value remapping
-├── _round.py                # rounding with NaN safety
-├── _slice.py                # row / column subsetting
-├── _sort.py                 # multi-key sort wrappers
-├── _ignore_SettingWithCopyWarning.py
-└── _convert/                # long ↔ wide pivots (from_xyz / to_xy / to_xyz)
-```
+
+<p align="center"><sub><b>Figure 2.</b> Module layout: one helper per file, all DataFrame-in / DataFrame-out around a shared core.</sub></p>
 
 `scitex-pd` is a thin layer on top of `pandas` + `numpy`; the only
 non-stdlib dep beyond those is `scitex-types` (for `is_listed_X`).
@@ -116,6 +155,8 @@ flowchart LR
     inspect --> out2[("p-value columns / uniques")]
     transform --> out3[(transformed DataFrame)]
 ```
+
+<p align="center"><sub><b>Figure 3.</b> End-to-end flow: coerce → reshape / inspect / transform → analysis-ready tables.</sub></p>
 
 ## Quick Start
 

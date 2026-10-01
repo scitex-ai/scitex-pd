@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "scitex-pd"
-version = "0.1.4"
+version = "0.1.7"
 description = "Pandas helpers (force_df, melt_cols, find_pval, mv, slice, sort, round, …) — standalone module from the SciTeX ecosystem"
 readme = "README.md"
 license = "AGPL-3.0-only"
@@ -58,6 +58,10 @@ scitex-pd = "scitex_pd"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = ["--disable-warnings"]
+markers = [
+    "smoke: fast CLI happy-path tests (<60s, runs on every PR)",
+    "e2e: end-to-end workflows against real subsystems (runs on every PR)",
+]
 
 [tool.ruff]
 target-version = "py39"
@@ -69,3 +73,15 @@ ignore = ["E501"]
 
 [tool.scitex-linter]
 library_dirs = ["src", "tests", "examples", "apps", "config", "docs"]
+
+[tool.scitex_dev.audit]
+# PS-168 — Per-package secret + env-var prefix in GitHub Actions workflows.
+# `GH_PERSONAL_ACCESS_TOKEN` is the ecosystem-wide cross-cutting PAT
+# used by the contributor-assistant CLA action. The natural GITHUB_*
+# namespace is reserved by GitHub Actions on the secret-name surface
+# (HTTP 422 on every `gh secret set`), so the GH_ shorthand is the
+# canonical substitute and is registered ecosystem-wide via PR #122
+# on scitex-dev (EXCEPTION_SECRETS_DEFAULT). This per-package entry
+# pins the same exception inline so the audit passes on every
+# scitex-dev version, independent of release timing.
+ps168_secret_exceptions = ["GH_PERSONAL_ACCESS_TOKEN"]
