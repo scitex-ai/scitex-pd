@@ -72,21 +72,23 @@ def get_unique(
 
 if __name__ == "__main__":
     # Test the function
+    import sys
+
     import pandas as pd
 
     # Test case 1: Unique value
     df1 = pd.DataFrame({"patient_id": ["P01", "P01", "P01"]})
     assert get_unique(df1, "patient_id") == "P01"
-    print("✓ Test 1 passed: Unique value extracted")
+    sys.stdout.write("✓ Test 1 passed: Unique value extracted\n")
 
     # Test case 2: Multiple values with default
     df2 = pd.DataFrame({"patient_id": ["P01", "P02"]})
     assert get_unique(df2, "patient_id", default="Unknown") == "Unknown"
-    print("✓ Test 2 passed: Default returned for multiple values")
+    sys.stdout.write("✓ Test 2 passed: Default returned for multiple values\n")
 
     # Test case 3: Missing column
     assert get_unique(df1, "missing_col", default="N/A") == "N/A"
-    print("✓ Test 3 passed: Default returned for missing column")
+    sys.stdout.write("✓ Test 3 passed: Default returned for missing column\n")
 
     # Test case 4: Raise on multiple
     raised = False
@@ -96,8 +98,8 @@ if __name__ == "__main__":
         raised = True
         assert "has 2 unique values" in str(e)
     assert raised, "Should have raised ValueError"
-    print("✓ Test 4 passed: ValueError raised for multiple values")
+    sys.stdout.write("✓ Test 4 passed: ValueError raised for multiple values\n")
 
-    print("\nAll tests passed!")
+    sys.stdout.write("\nAll tests passed!\n")
 
 # EOF
