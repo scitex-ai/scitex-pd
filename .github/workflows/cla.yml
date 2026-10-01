@@ -23,4 +23,9 @@ jobs:
     uses: scitex-ai/.github/.github/workflows/cla.yml@main
     with:
       owner_allowlist: "bot*,ywatanabe1989,LLEmacs"
-    secrets: inherit
+    # Explicit secret mapping (PS-224): the callee declares
+    # `secrets: GH_PERSONAL_ACCESS_TOKEN: required: true` and supports
+    # explicit mapping — `secrets: inherit` would forward EVERY repo
+    # secret into this attacker-triggerable job.
+    secrets:
+      GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.GH_PERSONAL_ACCESS_TOKEN }}

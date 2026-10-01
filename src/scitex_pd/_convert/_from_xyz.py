@@ -58,6 +58,8 @@ def from_xyz(data_frame, x=None, y=None, z=None, square=False):
 
 
 if __name__ == "__main__":
+    import sys
+
     np.random.seed(42)
     stats = pd.DataFrame(
         {
@@ -68,4 +70,4 @@ if __name__ == "__main__":
     )
     stats = stats.rename(columns={"col1": "x", "col2": "y", "p_val": "z"})
     result = from_xyz(stats)
-    print(result)
+    sys.stdout.write(str(result) + "\n")
