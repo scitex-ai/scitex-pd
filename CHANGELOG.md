@@ -7,6 +7,13 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-10-02
+
+- Promote the existing 0.1.5/0.1.6 history, DataFrame documentation fixes, and owning pipeline tests.
+- Repair release SIF execution with verified images and job-owned temporary paths.
+- Execute the owning end-to-end workflow during release validation.
+
+
 ## [0.1.6]
 
 - Fix tests: remove duplicate `from __future__ import annotations`.
