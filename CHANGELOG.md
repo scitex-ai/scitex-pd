@@ -7,6 +7,9 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- Preserve row membership checks when pandas extension arrays cannot represent a condition candidate, including Arrow-backed strings.
+- Correct skills with supported Python call forms, complete examples and accurate finder and reshape behavior.
+
 ## [0.1.7] - 2026-10-02
 
 - Promote the existing 0.1.5/0.1.6 history, DataFrame documentation fixes, and owning pipeline tests.
