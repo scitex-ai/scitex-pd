@@ -7,6 +7,7 @@ versions follow [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+- Describe `find_indi` results as original index labels, retaining string and tuple labels rather than promising integer row positions.
 - Preserve row membership checks when pandas extension arrays cannot represent a condition candidate, including Arrow-backed strings.
 - Correct skills with supported Python call forms, complete examples and accurate finder and reshape behavior.
 
