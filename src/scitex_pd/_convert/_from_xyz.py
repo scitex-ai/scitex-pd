@@ -21,7 +21,12 @@ def from_xyz(data_frame, x=None, y=None, z=None, square=False):
     ... })
     >>> data = data.rename(columns={"col1": "x", "col2": "y", "p_val": "z"})
     >>> result = from_xyz(data)
-    >>> print(result)
+    >>> result.shape
+    (3, 3)
+    >>> float(result.loc["X", "A"])
+    0.01
+    >>> float(result.loc["X", "B"])
+    0.0
 
     Parameters
     ----------
