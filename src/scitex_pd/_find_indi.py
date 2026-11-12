@@ -3,7 +3,7 @@
 # Time-stamp: "2024-11-05 08:11:05 (ywatanabe)"
 # File: ./scitex_repo/src/scitex/pd/_find_indi.py
 
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 import pandas as pd
 
@@ -54,7 +54,7 @@ import pandas as pd
 
 def find_indi(
     df: pd.DataFrame, conditions: Dict[str, Union[str, int, float, List]]
-) -> List[int]:
+) -> List[Any]:
     """Finds indices of rows that satisfy conditions, handling NaN values.
 
     Example
@@ -62,6 +62,11 @@ def find_indi(
     >>> df = pd.DataFrame({'A': [1, 2, None], 'B': ['x', 'y', 'x']})
     >>> conditions = {'A': [1, None], 'B': 'x'}
     >>> result = find_indi(df, conditions)
+    >>> result
+    [0, 2]
+    >>> named = pd.DataFrame({'A': [1, 2, 1]}, index=['a', 'b', 'c'])
+    >>> find_indi(named, {'A': 1})
+    ['a', 'c']
 
     Parameters
     ----------
@@ -72,8 +77,9 @@ def find_indi(
 
     Returns
     -------
-    List[int]
-        List of integer indices of matching rows
+    List[Any]
+        Matching index labels in DataFrame order, rather than integer row
+        positions.
     """
     if not conditions:
         return []
