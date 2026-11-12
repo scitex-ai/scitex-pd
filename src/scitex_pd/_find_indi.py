@@ -78,8 +78,8 @@ def find_indi(
     Returns
     -------
     List[Any]
-        Original index labels of matching rows, in DataFrame order. Labels
-        retain their original types; these are not integer row positions.
+        Matching index labels in DataFrame order, rather than integer row
+        positions.
     """
     if not conditions:
         return []
