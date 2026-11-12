@@ -14,56 +14,63 @@ import pandas as pd
 
 
 def force_df(data, filler=np.nan):
-    """
-    Convert various data types to pandas DataFrame.
+    """Convert supported inputs to a pandas DataFrame.
 
     Parameters
     ----------
-    data : various
-        The data to convert to DataFrame. Can be DataFrame, Series, ndarray,
-        list, tuple, dict, scalar value, etc.
-    filler : any, optional
-        Value to use for filling missing values, by default np.nan
+    data : object
+        DataFrame, Series, NumPy array, list, tuple, dictionary, scalar or
+        iterable to convert. A DataFrame is returned unchanged; None produces
+        an empty DataFrame.
+    filler : object, optional
+        Value appended to shorter dictionary values, by default numpy.nan.
 
     Returns
     -------
-    pd.DataFrame
-        Data converted to DataFrame
+    pandas.DataFrame
+        Converted data. DataFrame input retains its object identity.
 
     Examples
     --------
-    >>> import scitex
-    >>> import pandas as pd
+    Import the standalone provider and the input types:
+
+    >>> from scitex_pd import force_df
     >>> import numpy as np
-    >>> df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    >>> scitex.pd.force_df(df) is df
+    >>> import pandas as pd
+
+    DataFrame input retains its identity; Series input retains its name:
+
+    >>> frame = pd.DataFrame({"A": [1, 2], "B": [3, 4]})
+    >>> force_df(frame) is frame
     True
-    >>> series = pd.Series([1, 2, 3], name='test')
-    >>> scitex.pd.force_df(series)
-       test
-    0     1
-    1     2
-    2     3
-    >>> arr = np.array([1, 2, 3])
-    >>> scitex.pd.force_df(arr)
-       value
-    0      1
-    1      2
-    2      3
-    >>> scitex.pd.force_df(42)
-       value
-    0     42
-    >>> scitex.pd.force_df([1, 2, 3])
-       value
-    0      1
-    1      2
-    2      3
-    >>> data = {'A': [1, 2, 3], 'B': [4, 5]}
-    >>> scitex.pd.force_df(data)
-       A  B
-    0  1  4
-    1  2  5
-    2  3  NaN
+    >>> series = pd.Series([1, 2, 3], name="test")
+    >>> force_df(series).equals(series.to_frame())
+    True
+
+    One-dimensional arrays, lists and scalars use a ``value`` column:
+
+    >>> force_df(np.array([1, 2, 3])).to_dict("list")
+    {'value': [1, 2, 3]}
+    >>> force_df([1, 2, 3]).to_dict("list")
+    {'value': [1, 2, 3]}
+    >>> force_df(42).to_dict("list")
+    {'value': [42]}
+    >>> force_df(None).empty
+    True
+
+    Shorter dictionary values are padded. Check values directly rather than
+    relying on pandas' display formatting or dtype inference:
+
+    >>> data = {"A": [1, 2, 3], "B": [4, 5]}
+    >>> padded = force_df(data)
+    >>> padded["A"].tolist()
+    [1, 2, 3]
+    >>> padded["B"].iloc[:2].tolist() == [4, 5]
+    True
+    >>> bool(pd.isna(padded.loc[2, "B"]))
+    True
+    >>> force_df(data, filler=0).to_dict("list")
+    {'A': [1, 2, 3], 'B': [4, 5, 0]}
     """
     # Return None as empty DataFrame
     if data is None:
