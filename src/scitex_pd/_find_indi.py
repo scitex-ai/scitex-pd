@@ -103,10 +103,15 @@ def find_indi(
                     pd.isna(v) if not isinstance(v, str) else False for v in value
                 )
 
-            if has_na:
-                condition = df[key].isin(value) | df[key].isna()
-            else:
+            try:
                 condition = df[key].isin(value)
+            except (TypeError, ValueError):
+                # Extension arrays may reject candidates they cannot represent
+                # (e.g. Arrow strings with a custom Python object). Preserve
+                # pandas' object-membership semantics for those candidates.
+                condition = df[key].astype(object).isin(value)
+            if has_na:
+                condition = condition | df[key].isna()
         else:
             # Handle single NaN value
             if pd.isna(value):
