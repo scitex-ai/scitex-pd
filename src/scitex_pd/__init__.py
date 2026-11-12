@@ -12,7 +12,7 @@ Functionalities
   unique-values inspection helpers.
 - `merge_columns` / `merge_cols`, `melt_cols`, `mv` /
   `mv_to_first` / `mv_to_last` — column combine / reshape / reorder.
-- `replace(df, mapping)`, `round(df, ndigits)`, `slice(df, ...)`,
+- `replace(df, mapping)`, `round(df, factor)`, `slice(df, ...)`,
   `sort(df, ...)` — uniform DataFrame-in / DataFrame-out transforms.
 - `ignore_setting_with_copy_warning()` — context-manager for the
   pandas SettingWithCopyWarning.
@@ -21,8 +21,10 @@ IO
 --
 - Reads: `pandas.DataFrame`, `pandas.Series`, `numpy.ndarray`, dict,
   list, scalar inputs.
-- Writes: nothing — all functions return new pandas objects; original
-  inputs are not mutated.
+- Files: no file reads or writes.
+- Object identity depends on the helper. In particular, `force_df(df)` returns
+  an existing DataFrame unchanged; its result is not an independent copy.
+  See each function for its return and input-handling behavior.
 
 Dependencies
 ------------
